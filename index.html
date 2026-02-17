@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Kalkulator B2B – z „Pokaż więcej opcji”</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;padding:24px;background:#0f1115;color:#111}
+    .wrap{max-width:860px;margin:0 auto;background:#fff;border-radius:18px;padding:22px 22px 26px;box-shadow:0 18px 60px rgba(0,0,0,.35)}
+    .top{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#6b7280;margin-bottom:8px}
+    h1{font-size:44px;line-height:1.05;margin:0 0 16px;font-weight:800}
+    .divider{height:1px;background:#e5e7eb;margin:14px 0 18px}
+    .row{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+    .field{width:100%;margin:14px 0}
+    label{display:block;font-weight:700;margin-bottom:8px}
+    input[type="number"], select{
+      width:220px;max-width:100%;
+      padding:12px 12px;border:1px solid #d1d5db;border-radius:10px;
+      font-size:16px
+    }
+    .unit{color:#6b7280;margin-left:8px}
+    input[type="range"]{width:100%}
+    .rangeBox{flex:1;min-width:260px}
+    .rangeMeta{display:flex;justify-content:space-between;color:#6b7280;font-size:12px;margin-top:6px}
+    .ticks{display:flex;justify-content:space-between;color:#6b7280;font-size:12px;margin-top:8px;gap:8px}
+    .ticks span{min-width:28px;text-align:center}
+    .zus{display:flex;gap:20px;align-items:center;flex-wrap:wrap;border-top:1px solid #eef2f7;padding-top:14px;margin-top:6px}
+    .radio{display:flex;align-items:center;gap:10px}
+    .radio input{width:18px;height:18px}
+    .moreBtn{
+      width:100%;margin:10px 0 0;
+      background:transparent;border:0;color:#2563eb;
+      font-weight:700;font-size:16px;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;gap:10px;
+      padding:14px 0
+    }
+    .chev{display:inline-block;transition:transform .2s ease}
+    .open .chev{transform:rotate(180deg)}
+    .moreBox{
+      display:none;
+      border-top:1px solid #eef2f7;
+      padding-top:16px;
+      margin-top:10px
+    }
+    .moreBox.open{display:block}
+    .moreGrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .inlineRadios{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+    .card{
+      background:#fff;border:1px solid #e5e7eb;border-radius:16px;
+      padding:18px;margin-top:18px;box-shadow:0 10px 30px rgba(0,0,0,.08)
+    }
+    .card h3{margin:0 0 12px;font-size:22px}
+    .line{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-top:1px solid #eef2f7;font-size:20px}
+    .line:first-of-type{border-top:0}
+    .val{font-weight:800}
+    .badge{font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid #bfdbfe;background:#eff6ff;color:#2563eb;font-weight:800;margin-left:10px}
+    @media (max-width:720px){
+      h1{font-size:34px}
+      .moreGrid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap" id="calcWrap">
+    <div class="top">KALKULATOR DZIAŁALNOŚCI GOSPODARCZEJ</div>
+    <h1>Najkorzystniejsza forma<br>opodatkowania</h1>
+    <div class="divider"></div>
+
+    <!-- Przychód -->
+    <div class="field">
+      <label for="incomeAmount">Twój miesięczny przychód netto</label>
+      <div class="row">
+        <div>
+          <input type="number" id="incomeAmount" min="0" step="100" value="10000">
+          <span class="unit">zł</span>
+        </div>
+        <div class="rangeBox">
+          <input type="range" id="incomeRange" min="100" max="100000" step="100" value="10000">
+          <div class="rangeMeta"><span>100 zł</span><span>100 000 zł</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Koszty -->
+    <div class="field">
+      <label for="costAmount">Twoje miesięczne koszty netto</label>
+      <div class="row">
+        <div>
+          <input type="number" id="costAmount" min="0" step="50" value="500">
+          <span class="unit">zł</span>
+        </div>
+        <div class="rangeBox">
+          <input type="range" id="costRange" min="0" max="20000" step="50" value="500">
+          <div class="rangeMeta"><span>0 zł</span><span>20 000 zł</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ryczałt stawka -->
+    <div class="field">
+      <label for="ryczRateDisplay">Stawka ryczałtu</label>
+      <div class="row">
+        <div>
+          <input type="number" id="ryczRateDisplay" min="0" step="0.1" value="12">
+          <span class="unit">%</span>
+        </div>
+        <div class="rangeBox">
+          <input type="range" id="ryczRateIndex" min="0" max="8" step="1" value="4">
+          <div class="ticks" aria-hidden="true">
+            <span>2%</span><span>3%</span><span>5.5%</span><span>8.5%</span><span>12%</span><span>12.5%</span><span>14%</span><span>15%</span><span>17%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ZUS -->
+    <div class="zus">
+      <div style="font-weight:800;color:#6b7280">Jaki ZUS opłacasz?</div>
+      <label class="radio"><input type="radio" name="zusOption" value="DUZY" checked> Duży ZUS</label>
+      <label class="radio"><input type="radio" name="zusOption" value="MALY"> Mały ZUS</label>
+    </div>
+
+    <!-- Pokaż więcej opcji -->
+    <button class="moreBtn" id="moreBtn" type="button" aria-expanded="false">
+      Pokaż więcej opcji <span class="chev">⌄</span>
+    </button>
+
+    <div class="moreBox" id="moreBox">
+      <div class="moreGrid">
+        <div>
+          <label for="otherIncome">Dochód z innych źródeł (mies.)</label>
+          <input type="number" id="otherIncome" min="0" step="100" value="0">
+          <div class="rangeMeta" style="margin-top:8px">
+            Wpływa tylko na <b>skalę</b>.
+          </div>
+        </div>
+
+        <div>
+          <label for="childrenCount">Liczba dzieci</label>
+          <select id="childrenCount">
+            <option value="0" selected>0</option>
+            <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+            <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+            <option value="7">7</option><option value="8">8</option><option value="9">9</option>
+          </select>
+          <div class="rangeMeta" style="margin-top:8px">Ulga na dzieci wpływa na <b>skalę</b>.</div>
+        </div>
+
+        <div style="grid-column:1 / -1">
+          <label>Rozliczenie z małżonkiem</label>
+          <div class="inlineRadios">
+            <label class="radio"><input type="radio" name="spouseSettle" value="no" checked> Nie</label>
+            <label class="radio"><input type="radio" name="spouseSettle" value="yes"> Tak</label>
+            <div id="spouseIncomeWrap" style="display:none">
+              <span style="font-weight:700;color:#6b7280;margin-right:10px">Dochód małżonka (rocznie)</span>
+              <input type="number" id="spouseIncomeYear" min="0" step="1000" value="0">
+              <span class="unit">zł/rok</span>
+            </div>
+          </div>
+          <div class="rangeMeta" style="margin-top:8px">
+            Wpływa na <b>skalę</b> (wspólne rozliczenie).
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wyniki -->
+    <div class="card">
+      <h3>Twój miesięczny dochód netto</h3>
+
+      <div class="line" id="lineScale">
+        <div>Skala podatkowa</div>
+        <div class="val" id="netScale">0,00 zł</div>
+      </div>
+
+      <div class="line" id="lineLinear">
+        <div>Podatek liniowy</div>
+        <div class="val" id="netLinear">0,00 zł</div>
+      </div>
+
+      <div class="line" id="lineRycz">
+        <div>Ryczałt</div>
+        <div class="val" id="netRycz">0,00 zł</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ====== DANE (2026) – zgodne z calculators-base-js-extra ====== */
+const contributionsData = {
+  "2026": {
+    zus_small: 456.18,
+    zus_large: 1926.76,
+    zus_no_labor_fund: 1788.29,
+    health_contribution_general: 432.54,
+    health_contribution_linear: 432.54,
+    health_contribution_lumpsum_60: 498.35,
+    health_contribution_lumpsum_300: 830.58,
+    health_contribution_lumpsum_over_300: 1495.04,
+    health_contribution_min_linear: 8827.35,   // PRÓG miesięczny podstawy (w inFakt jest mnożony *12)
+    salary_min: 4806,
+    limit_health_contribution: 14100
+  }
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  const YEAR = "2026";
+  const C = contributionsData[YEAR];
+  const RYCZ_RATES = [2, 3, 5.5, 8.5, 12, 12.5, 14, 15, 17];
+
+  // DOM
+  const incomeAmount = document.getElementById("incomeAmount");
+  const costAmount   = document.getElementById("costAmount");
+  const incomeRange  = document.getElementById("incomeRange");
+  const costRange    = document.getElementById("costRange");
+
+  const ryczRateDisplay = document.getElementById("ryczRateDisplay");
+  const ryczRateIndex   = document.getElementById("ryczRateIndex");
+
+  const otherIncome     = document.getElementById("otherIncome");
+  const childrenCount   = document.getElementById("childrenCount");
+  const spouseIncomeWrap= document.getElementById("spouseIncomeWrap");
+  const spouseIncomeYear= document.getElementById("spouseIncomeYear");
+
+  const netScaleEl  = document.getElementById("netScale");
+  const netLinearEl = document.getElementById("netLinear");
+  const netRyczEl   = document.getElementById("netRycz");
+
+  const lineScale  = document.getElementById("lineScale");
+  const lineLinear = document.getElementById("lineLinear");
+  const lineRycz   = document.getElementById("lineRycz");
+
+  // Show more
+  const moreBtn = document.getElementById("moreBtn");
+  const moreBox = document.getElementById("moreBox");
+  moreBtn.addEventListener("click", () => {
+    const isOpen = moreBox.classList.toggle("open");
+    moreBtn.setAttribute("aria-expanded", String(isOpen));
+    moreBtn.classList.toggle("open", isOpen);
+  });
+
+  document.querySelectorAll('input[name="spouseSettle"]').forEach(r => {
+    r.addEventListener("change", () => {
+      const yes = document.querySelector('input[name="spouseSettle"]:checked')?.value === "yes";
+      spouseIncomeWrap.style.display = yes ? "inline-flex" : "none";
+      calculate();
+    });
+  });
+
+  function n(v){ const x = Number(v); return Number.isFinite(x) ? x : 0; }
+  function round2(v){ return Math.round((v + Number.EPSILON) * 100) / 100; }
+  function fmtPLN(v){
+    return (Number.isFinite(v) ? v : 0).toLocaleString("pl-PL",{minimumFractionDigits:2,maximumFractionDigits:2}) + " zł";
+  }
+
+  function getZusSocialM(){
+    const key = document.querySelector('input[name="zusOption"]:checked')?.value || "DUZY";
+    return key === "MALY" ? C.zus_small : C.zus_large;
+  }
+
+  // ZUS do ryczałtowej podstawy (bez FP przy dużym)
+  function getZusLumpsumM(){
+    const key = document.querySelector('input[name="zusOption"]:checked')?.value || "DUZY";
+    if (key === "MALY") return C.zus_small; // brak osobnej wartości w danych → przyjmujemy tak jak inFakt (mały)
+    return C.zus_no_labor_fund;             // duży bez FP
+  }
+
+  function ryczHealthMonthByRevenueYear(revMinusZusLumpY){
+    if (revMinusZusLumpY <= 60000) return C.health_contribution_lumpsum_60;
+    if (revMinusZusLumpY <= 300000) return C.health_contribution_lumpsum_300;
+    return C.health_contribution_lumpsum_over_300;
+  }
+
+  function childCreditYear(kids, spouseYes, commonIncomeY){
+    if (!kids) return 0;
+    if (kids === 1){
+      const limit = spouseYes ? 112000 : 56000;
+      return commonIncomeY > limit ? 0 : 1112.04;
+    }
+    if (kids === 2) return 2224.08;
+    if (kids === 3) return 4224.12;
+    if (kids === 4) return 6924.12;
+    if (kids === 5) return 9624.12;
+    if (kids === 6) return 12324.12;
+    if (kids === 7) return 15024.12;
+    if (kids === 8) return 17724.12;
+    if (kids >= 9) return 20424.12;
+    return 0;
+  }
+
+  function pitScaleYear(taxableY, spouseYes){
+    const TH = 120000;
+    const FREE = 30000;
+    const half = spouseYes ? taxableY / 2 : taxableY;
+
+    const base = Math.max(0, half);
+    const part12 = Math.max(0, Math.min(base, TH) - FREE) * 0.12;
+    const part32 = Math.max(0, base - TH) * 0.32;
+
+    const taxHalf = part12 + part32;
+    const tax = spouseYes ? (2 * taxHalf) : taxHalf;
+
+    return Math.max(0, round2(tax));
+  }
+
+  function setBestHighlight(nets){
+    [lineScale, lineLinear, lineRycz].forEach(el => el.style.background = "transparent");
+    netScaleEl.innerHTML = netScaleEl.textContent;
+    netLinearEl.innerHTML = netLinearEl.textContent;
+    netRyczEl.innerHTML = netRyczEl.textContent;
+
+    const bestKey = Object.entries(nets).sort((a,b) => b[1]-a[1])[0][0];
+    const badge = ' <span class="badge">najlepsza</span>';
+
+    if(bestKey === "scale"){
+      lineScale.style.background = "#f3f8ff";
+      netScaleEl.innerHTML = netScaleEl.textContent + badge;
+    } else if(bestKey === "linear"){
+      lineLinear.style.background = "#f3f8ff";
+      netLinearEl.innerHTML = netLinearEl.textContent + badge;
+    } else {
+      lineRycz.style.background = "#f3f8ff";
+      netRyczEl.innerHTML = netRyczEl.textContent + badge;
+    }
+  }
+
+  function calculate(){
+    const revenueM = n(incomeAmount.value);
+    const costsM   = n(costAmount.value);
+
+    const zusM = getZusSocialM();     // pełny ZUS (cash outflow)
+    const zusY = zusM * 12;
+
+    const revenueY = revenueM * 12;
+    const costsY   = costsM * 12;
+
+    const incomeMinusCostsY = revenueY - costsY;
+    const taxBaseY = incomeMinusCostsY - zusY; // (roczna podstawa po ZUS społecznych)
+
+    /* =======================
+       SKALA
+    ======================= */
+    const salaryMinY = C.salary_min * 12;
+    const minHealthScaleY = C.health_contribution_general * 12;
+
+    const healthScaleY =
+      (taxBaseY < 0.75 * salaryMinY)
+        ? minHealthScaleY
+        : 0.09 * Math.max(0, taxBaseY);
+
+    const contributionsScaleY = zusY + healthScaleY;
+
+    const otherIncomeY = n(otherIncome.value) * 12;
+    const kids = Number(childrenCount.value || 0);
+
+    const spouseYes = (document.querySelector('input[name="spouseSettle"]:checked')?.value === "yes");
+    const spouseIncomeY = spouseYes ? n(spouseIncomeYear.value) : 0;
+
+    const taxableScaleY = Math.max(0, taxBaseY + otherIncomeY + spouseIncomeY);
+    const childCreditY = childCreditYear(kids, spouseYes, taxableScaleY);
+
+    let pitScaleY = pitScaleYear(taxableScaleY, spouseYes) - childCreditY;
+    pitScaleY = Math.max(0, round2(pitScaleY));
+
+    const netScaleM = round2((incomeMinusCostsY - contributionsScaleY - pitScaleY) / 12);
+
+    /* =======================
+       LINIOWY – 1:1 jak inFakt (2022-07 logika)
+       - zdrowotna: min jeśli base < 12*health_contribution_min_linear
+       - PIT: odliczenie zdrowotnej od podstawy do limitu limit_health_contribution
+    ======================= */
+    const linearBaseY = Math.max(0, taxBaseY);
+
+    const linearMinThresholdY = 12 * C.health_contribution_min_linear;
+    const healthLinearY =
+      (linearBaseY < linearMinThresholdY)
+        ? (12 * C.health_contribution_linear)
+        : (0.049 * linearBaseY);
+
+    const deductibleHealthLinearY = Math.min(healthLinearY, C.limit_health_contribution);
+    const pitLinearY = 0.19 * Math.max(0, linearBaseY - deductibleHealthLinearY);
+
+    const netLinearM = round2((incomeMinusCostsY - (zusY + healthLinearY) - pitLinearY) / 12);
+
+    /* =======================
+       RYCZAŁT – 1:1 jak inFakt (2022-07 logika)
+       - zdrowotna progowa wg (przychód roczny - zus_lumpsum)
+       - cash składek: pełny ZUS + zdrowotna
+       - podstawa podatku: przychód roczny - (zdrowotna/2) - zus_lumpsum
+    ======================= */
+    const rate = Math.max(0, n(ryczRateDisplay.value)) / 100;
+
+    const zusLumpsumY = getZusLumpsumM() * 12; // do podstawy podatku ryczałtu
+    const revMinusZusLumpY = revenueY - zusLumpsumY;
+
+    const healthRyczM = ryczHealthMonthByRevenueYear(revMinusZusLumpY);
+    const healthRyczY = healthRyczM * 12;
+
+    const ryczBaseY = Math.max(0, revenueY - (healthRyczY / 2) - zusLumpsumY);
+    const pitRyczY  = Math.max(0, ryczBaseY * rate);
+
+    const netRyczM = round2((incomeMinusCostsY - (zusY + healthRyczY) - pitRyczY) / 12);
+
+    // render
+    netScaleEl.textContent  = fmtPLN(netScaleM);
+    netLinearEl.textContent = fmtPLN(netLinearM);
+    netRyczEl.textContent   = fmtPLN(netRyczM);
+
+    setBestHighlight({ scale: netScaleM, linear: netLinearM, rycz: netRyczM });
+  }
+
+  // ===== Sync suwaków =====
+  function syncIncomeFromInput(){
+    let v = n(incomeAmount.value);
+    if (v < 0) v = 0;
+    incomeAmount.value = v;
+    incomeRange.value = String(Math.min(100000, Math.max(100, v)));
+    calculate();
+  }
+  function syncIncomeFromRange(){
+    incomeAmount.value = String(n(incomeRange.value));
+    calculate();
+  }
+  function syncCostFromInput(){
+    let v = n(costAmount.value);
+    if (v < 0) v = 0;
+    costAmount.value = v;
+    costRange.value = String(Math.min(20000, Math.max(0, v)));
+    calculate();
+  }
+  function syncCostFromRange(){
+    costAmount.value = String(n(costRange.value));
+    calculate();
+  }
+  function syncRyczFromIndex(){
+    const idx = Math.round(n(ryczRateIndex.value));
+    const rr = RYCZ_RATES[Math.min(RYCZ_RATES.length-1, Math.max(0, idx))];
+    ryczRateDisplay.value = String(rr);
+    calculate();
+  }
+  function syncRyczFromInput(){
+    const v = n(ryczRateDisplay.value);
+    let bestIdx = 0, bestDiff = Infinity;
+    RYCZ_RATES.forEach((r,i) => {
+      const d = Math.abs(r - v);
+      if (d < bestDiff) { bestDiff = d; bestIdx = i; }
+    });
+    ryczRateIndex.value = String(bestIdx);
+    ryczRateDisplay.value = String(RYCZ_RATES[bestIdx]);
+    calculate();
+  }
+
+  // listeners
+  incomeAmount.addEventListener("input", syncIncomeFromInput);
+  incomeRange.addEventListener("input", syncIncomeFromRange);
+
+  costAmount.addEventListener("input", syncCostFromInput);
+  costRange.addEventListener("input", syncCostFromRange);
+
+  ryczRateIndex.addEventListener("input", syncRyczFromIndex);
+  ryczRateDisplay.addEventListener("change", syncRyczFromInput);
+
+  otherIncome.addEventListener("input", calculate);
+  childrenCount.addEventListener("change", calculate);
+  spouseIncomeYear.addEventListener("input", calculate);
+
+  document.querySelectorAll('input[name="zusOption"]').forEach(r => r.addEventListener("change", calculate));
+
+  // init
+  syncRyczFromIndex();
+  calculate();
+});
+</script>
+</body>
+</html>
